@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Pižama Navy — Gallery</title>
+<style>
+  :root { --bg:#faf8f5; --ink:#2b2925; --muted:#8a8378; --accent:#9db48a; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--ink);
+         font:16px/1.6 -apple-system, "Helvetica Neue", Segoe UI, sans-serif;
+         -webkit-font-smoothing:antialiased; }
+  header { max-width:1080px; margin:0 auto; padding:64px 24px 40px; text-align:center; }
+  header .eyebrow { letter-spacing:.22em; text-transform:uppercase; font-size:12px; color:var(--accent); font-weight:600; }
+  header h1 { font-size:clamp(28px,5vw,44px); font-weight:600; letter-spacing:-.02em; margin:10px 0 8px; }
+  header p { color:var(--muted); max-width:560px; margin:0 auto; }
+  a.back { display:inline-block; margin-top:14px; color:var(--accent); text-decoration:none; font-weight:600; font-size:14px; }
+  .grid { max-width:1080px; margin:0 auto; padding:0 24px 80px;
+          display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:22px; }
+  figure { background:#fff; border-radius:14px; overflow:hidden;
+           box-shadow:0 1px 3px rgba(60,50,30,.08), 0 8px 28px rgba(60,50,30,.06); }
+  figure a { display:block; }
+  figure img { width:100%; aspect-ratio:4/3; object-fit:cover; display:block; }
+  figcaption { padding:14px 18px 16px; }
+  figcaption .num { font-size:11px; letter-spacing:.18em; color:var(--accent); font-weight:700; }
+  figcaption .cap { font-size:14.5px; color:var(--ink); margin-top:2px; }
+  .hero-tag { display:inline-block; background:var(--accent); color:#fff; font-size:11px;
+              font-weight:700; letter-spacing:.1em; border-radius:999px; padding:2px 10px; margin-left:8px; vertical-align:1px; }
+  footer { text-align:center; color:var(--muted); font-size:13px; padding:0 24px 56px; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#191713; --ink:#ece7df; --muted:#97907f; }
+    figure { background:#221f1a; box-shadow:0 1px 3px rgba(0,0,0,.4); }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Vitapur · Product Gallery</div>
+  <h1>Pižama Navy</h1>
+  <p>Primerjava verzij — popravljena svetloba na obrazu. Klik na sliko odpre polno velikost, spodaj lahko dodate komentar.</p>
+  <a class="back" href="index.html">&larr; All galleries</a>
+</header>
+<div class="grid">
+  <figure><a href="img/pizama_navy/v1_original.jpg" target="_blank"><img src="img/pizama_navy/v1_original.jpg" alt="Prvotna verzija" loading="lazy"></a>
+    <figcaption><span class="num">V1</span><div class="cap">Prvotna verzija (čudna svetloba na obrazu)</div></figcaption></figure>
+  <figure><a href="img/pizama_navy/v2_svetloba_fix.jpg" target="_blank"><img src="img/pizama_navy/v2_svetloba_fix.jpg" alt="Nova verzija — popravljena svetloba" loading="lazy"></a>
+    <figcaption><span class="num">V2<span class="hero-tag">NOVO</span></span><div class="cap">Popravljena svetloba na obrazu — mehka, enakomerna studijska svetloba</div></figcaption></figure>
+</div>
+<footer>Concept gallery · Vitapur</footer>
+<!-- Comment boxes appear automatically under every image - do not remove this line -->
+<script src="comments.js" defer></script>
+</body>
+</html>
