@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Potrditve — pregled po kategorijah</title>
+<style>
+  :root { --bg:#faf8f5; --ink:#2b2925; --muted:#8a8378; --accent:#9db48a; --bad:#c0665a; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--ink);
+         font:16px/1.6 -apple-system, "Helvetica Neue", Segoe UI, sans-serif;
+         -webkit-font-smoothing:antialiased; }
+  header { max-width:900px; margin:0 auto; padding:56px 24px 28px; text-align:center; }
+  header .eyebrow { letter-spacing:.22em; text-transform:uppercase; font-size:12px; color:var(--accent); font-weight:600; }
+  header h1 { font-size:clamp(26px,4.5vw,40px); font-weight:600; letter-spacing:-.02em; margin:10px 0 8px; }
+  header p { color:var(--muted); max-width:560px; margin:0 auto; }
+  a.back { display:inline-block; margin-top:12px; color:var(--accent); text-decoration:none; font-weight:600; font-size:14px; }
+  .wrap { max-width:900px; margin:0 auto; padding:0 24px 80px; }
+  .row { background:#fff; border-radius:14px; padding:16px 20px; margin-bottom:14px;
+         box-shadow:0 1px 3px rgba(60,50,30,.08); display:grid;
+         grid-template-columns:1fr auto; gap:4px 16px; align-items:center; }
+  .row h2 { font-size:16.5px; font-weight:600; }
+  .row h2 a { color:inherit; text-decoration:none; }
+  .row h2 a:hover { color:var(--accent); }
+  .row .nums { font-size:13.5px; color:var(--muted); }
+  .row .pct { font-size:20px; font-weight:700; justify-self:end; }
+  .row .pct.ok { color:var(--accent); }
+  .row .pct.bad { color:var(--bad); }
+  .bar { grid-column:1 / -1; height:8px; border-radius:999px; background:#efede7; overflow:hidden; position:relative; }
+  .bar i { display:block; height:100%; border-radius:999px; background:var(--accent); }
+  .bar.bad i { background:var(--bad); }
+  .bar em { position:absolute; top:-4px; bottom:-4px; left:70%; width:2px; background:rgba(43,41,37,.35); }
+  .status { grid-column:1 / -1; font-size:12.5px; font-weight:600; letter-spacing:.04em; }
+  .status.ok { color:var(--accent); }
+  .status.bad { color:var(--bad); }
+  .note { text-align:center; color:var(--muted); font-size:13px; padding:8px 24px 40px; }
+  .loading { text-align:center; color:var(--muted); padding:30px; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#191713; --ink:#ece7df; --muted:#97907f; }
+    .row { background:#221f1a; box-shadow:0 1px 3px rgba(0,0,0,.4); }
+    .bar { background:#2c2822; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Vitapur · interni pregled</div>
+  <h1>Potrditve po kategorijah</h1>
+  <p>Delež slik, ki jih je klient potrdil z gumbom »✓ Slika je OK«. Cilj: najmanj 70 % na kategorijo (črtica na stolpcu).</p>
+  <a class="back" href="index.html">&larr; Vse galerije</a>
+</header>
+<div class="wrap"><div class="loading">Nalagam …</div></div>
+<div class="note">Stran je interna — ni povezana z nobene javne strani. Podatki se berejo iz istega Google Sheeta kot komentarji.</div>
+<script>
+(function () {
+  var EP = 'https://script.google.com/macros/s/AKfycbw_v86WCB4X9IDygjf2Iiyeq-fugaLLUMVaZxcBAR8bQzC9NkSVDKIWscp63hgwM5Gu/exec';
+  var APPROVED = '__APPROVED__';
+  var TARGET = 0.70;
+  var wrap = document.querySelector('.wrap');
+
+  function cleanId(s) {
+    return String(s == null ? '' : s).split('?')[0].replace(/\.[a-z]+$/i, '');
+  }
+
+  fetch('index.html').then(function (r) { return r.text(); }).then(function (html) {
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    var pages = [];
+    doc.querySelectorAll('.card a[href$=".html"]').forEach(function (a) {
+      var key = a.getAttribute('href').replace('.html', '');
+      var title = (a.querySelector('h2') || {}).textContent || key;
+      if (key && key !== 'index' && pages.every(function (p) { return p.key !== key; }))
+        pages.push({ key: key, title: title.trim() });
+    });
+    return Promise.all(pages.map(function (p) {
+      return Promise.all([
+        fetch(p.key + '.html').then(function (r) { return r.text(); }).then(function (h) {
+          var d = new DOMParser().parseFromString(h, 'text/html');
+          var ids = [];
+          d.querySelectorAll('.grid figure img').forEach(function (im) {
+            var id = cleanId(im.getAttribute('src').split('/').pop());
+            if (id && ids.indexOf(id) < 0) ids.push(id);
+          });
+          return ids;
+        }),
+        fetch(EP + '?product=' + encodeURIComponent(p.key))
+          .then(function (r) { return r.json(); })
+          .catch(function () { return []; })
+      ]).then(function (res) {
+        var ids = res[0];
+        var approvedIds = {};
+        res[1].forEach(function (c) {
+          if (c.comment === APPROVED) approvedIds[cleanId(c.image)] = true;
+        });
+        var n = ids.filter(function (id) { return approvedIds[id]; }).length;
+        return { key: p.key, title: p.title, total: ids.length, approved: n };
+      });
+    }));
+  }).then(function (rows) {
+    rows.sort(function (a, b) {
+      return (b.approved / (b.total || 1)) - (a.approved / (a.total || 1));
+    });
+    wrap.innerHTML = rows.map(function (r) {
+      var pct = r.total ? r.approved / r.total : 0;
+      var ok = pct >= TARGET;
+      var pctTxt = Math.round(pct * 100) + '%';
+      return '<div class="row">' +
+        '<h2><a href="' + r.key + '.html">' + r.title + '</a></h2>' +
+        '<span class="pct ' + (ok ? 'ok' : 'bad') + '">' + pctTxt + '</span>' +
+        '<span class="nums">' + r.approved + ' od ' + r.total + ' slik potrjenih</span>' +
+        '<div class="bar ' + (ok ? '' : 'bad') + '"><i style="width:' + Math.max(2, pct * 100) + '%"></i><em></em></div>' +
+        '<span class="status ' + (ok ? 'ok' : 'bad') + '">' +
+        (ok ? '✓ CILJ DOSEŽEN (≥ 70 %)' : '✗ pod ciljem — še ' +
+          Math.max(0, Math.ceil(r.total * TARGET) - r.approved) + ' potrditev do 70 %') +
+        '</span></div>';
+    }).join('') || '<div class="loading">Ni kategorij.</div>';
+  }).catch(function () {
+    wrap.innerHTML = '<div class="loading">Napaka pri nalaganju podatkov.</div>';
+  });
+})();
+</script>
+</body>
+</html>

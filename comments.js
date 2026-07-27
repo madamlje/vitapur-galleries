@@ -1,5 +1,6 @@
 (function () {
   var EP = 'https://script.google.com/macros/s/AKfycbw_v86WCB4X9IDygjf2Iiyeq-fugaLLUMVaZxcBAR8bQzC9NkSVDKIWscp63hgwM5Gu/exec';
+  var APPROVED = '__APPROVED__';
   var product = location.pathname.split('/').pop().replace('.html', '');
   if (!product || product === 'index') return;
 
@@ -19,14 +20,24 @@
     '.cmts button{align-self:flex-end;font:600 12.5px inherit;letter-spacing:.04em;color:#fff;' +
     'background:var(--accent);border:0;border-radius:999px;padding:7px 18px;cursor:pointer}' +
     '.cmts button:disabled{opacity:.5;cursor:default}' +
-    '.cmts .cmts-note{font-size:12px;color:var(--muted)}';
+    '.cmts .cmts-note{font-size:12px;color:var(--muted)}' +
+    '.cmts-approve{display:flex;align-items:center;gap:10px;margin:0 0 10px}' +
+    '.cmts-approve button.ok{align-self:auto;background:transparent;color:var(--accent);' +
+    'border:1.5px solid var(--accent);border-radius:999px;padding:6px 16px;font:600 13px inherit;cursor:pointer}' +
+    '.cmts-approve button.ok:hover{background:rgba(157,180,138,.12)}' +
+    '.cmts-approve button.ok.done{background:var(--accent);color:#fff;cursor:default}' +
+    '.cmts-approve .ok-count{font-size:12px;color:var(--muted)}';
   document.head.appendChild(css);
 
   function imgId(fig) {
     var img = fig.querySelector('img');
     if (!img) return null;
-    var f = img.getAttribute('src').split('/').pop();
+    var f = img.getAttribute('src').split('/').pop().split('?')[0];
     return f.replace(/\.[a-z]+$/i, '');
+  }
+
+  function cleanId(s) {
+    return String(s == null ? '' : s).split('?')[0].replace(/\.[a-z]+$/i, '');
   }
 
   function esc(s) {
@@ -35,14 +46,34 @@
     return d.innerHTML;
   }
 
-  function render(box, items) {
+  function lsKey(id) { return 'approved:' + product + ':' + id; }
+
+  function render(box, items, id) {
+    var approvals = items.filter(function (c) { return c.comment === APPROVED; });
+    var comments = items.filter(function (c) { return c.comment !== APPROVED; });
     var list = box.querySelector('.cmts-list');
-    list.innerHTML = items.map(function (c) {
+    list.innerHTML = comments.map(function (c) {
       var d = c.ts ? new Date(c.ts) : null;
       var when = d ? d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear() : '';
       return '<div class="cmt"><b>' + esc(c.name || 'Anonymous') + '</b><time>' + when + '</time>' +
         '<p>' + esc(c.comment) + '</p></div>';
     }).join('');
+    var btn = box.querySelector('.cmts-approve button.ok');
+    var cnt = box.querySelector('.cmts-approve .ok-count');
+    var mine = false;
+    try { mine = !!localStorage.getItem(lsKey(id)); } catch (e) {}
+    if (approvals.length > 0 || mine) {
+      btn.classList.add('done');
+      btn.disabled = true;
+      btn.textContent = '✓ Potrjeno';
+      var n = approvals.length || 1;
+      cnt.textContent = n > 1 ? (n + '× potrjeno') : '';
+    } else {
+      btn.classList.remove('done');
+      btn.disabled = false;
+      btn.textContent = '✓ Slika je OK';
+      cnt.textContent = '';
+    }
   }
 
   var boxes = {};
@@ -52,6 +83,8 @@
     var box = document.createElement('div');
     box.className = 'cmts';
     box.innerHTML =
+      '<div class="cmts-approve"><button type="button" class="ok">✓ Slika je OK</button>' +
+      '<span class="ok-count"></span></div>' +
       '<div class="cmts-list"></div>' +
       '<form><input name="name" placeholder="Name (optional)" maxlength="80">' +
       '<textarea name="comment" placeholder="Add a comment about this image..." maxlength="1500" required></textarea>' +
@@ -59,10 +92,29 @@
     fig.appendChild(box);
     boxes[id] = box;
 
+    var okBtn = box.querySelector('.cmts-approve button.ok');
+    okBtn.addEventListener('click', function () {
+      if (okBtn.classList.contains('done')) return;
+      okBtn.disabled = true;
+      okBtn.textContent = 'Shranjujem…';
+      var name = '';
+      var nameInput = box.querySelector('form input[name="name"]');
+      if (nameInput && nameInput.value.trim()) name = nameInput.value.trim();
+      fetch(EP, { method: 'POST', body: JSON.stringify({ product: product, image: id, name: name, comment: APPROVED }) })
+        .then(function () {
+          try { localStorage.setItem(lsKey(id), '1'); } catch (e) {}
+          return load();
+        })
+        .catch(function () {
+          okBtn.disabled = false;
+          okBtn.textContent = '✓ Slika je OK';
+        });
+    });
+
     var form = box.querySelector('form');
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
-      var btn = form.querySelector('button');
+      var btn = form.querySelector('button[type="submit"]');
       var note = form.querySelector('.cmts-note');
       var payload = {
         product: product,
@@ -70,7 +122,7 @@
         name: form.name.value.trim(),
         comment: form.comment.value.trim()
       };
-      if (!payload.comment) return;
+      if (!payload.comment || payload.comment === APPROVED) return;
       btn.disabled = true;
       note.textContent = 'Sending...';
       fetch(EP, { method: 'POST', body: JSON.stringify(payload) })
@@ -89,8 +141,11 @@
       .then(function (r) { return r.json(); })
       .then(function (all) {
         var byImg = {};
-        all.forEach(function (c) { (byImg[c.image] = byImg[c.image] || []).push(c); });
-        Object.keys(boxes).forEach(function (id) { render(boxes[id], byImg[id] || []); });
+        all.forEach(function (c) {
+          var k = cleanId(c.image);
+          (byImg[k] = byImg[k] || []).push(c);
+        });
+        Object.keys(boxes).forEach(function (id) { render(boxes[id], byImg[id] || [], id); });
       })
       .catch(function () {});
   }
