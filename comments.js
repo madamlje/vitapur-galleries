@@ -30,9 +30,11 @@
   document.head.appendChild(css);
 
   function imgId(fig) {
-    var img = fig.querySelector('img');
-    if (!img) return null;
-    var f = img.getAttribute('src').split('/').pop().split('?')[0];
+    var el = fig.querySelector('img') || fig.querySelector('video');
+    if (!el) return null;
+    var src = el.getAttribute('src') || el.getAttribute('poster');
+    if (!src) return null;
+    var f = src.split('/').pop().split('?')[0];
     return f.replace(/\.[a-z]+$/i, '');
   }
 
