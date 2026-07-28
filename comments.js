@@ -21,6 +21,10 @@
     'background:var(--accent);border:0;border-radius:999px;padding:7px 18px;cursor:pointer}' +
     '.cmts button:disabled{opacity:.5;cursor:default}' +
     '.cmts .cmts-note{font-size:12px;color:var(--muted)}' +
+    '.cmt.fix{background:rgba(157,180,138,.22)}' +
+    '.cmt.fix p{font-weight:600}' +
+    '.cmt.resolved{opacity:.55}' +
+    '.cmt.resolved p{text-decoration:line-through}' +
     '.cmts-approve{display:flex;align-items:center;gap:10px;margin:0 0 10px}' +
     '.cmts-approve button.ok{align-self:auto;background:transparent;color:var(--accent);' +
     'border:1.5px solid var(--accent);border-radius:999px;padding:6px 16px;font:600 13px inherit;cursor:pointer}' +
@@ -54,10 +58,15 @@
     var approvals = items.filter(function (c) { return c.comment === APPROVED; });
     var comments = items.filter(function (c) { return c.comment !== APPROVED; });
     var list = box.querySelector('.cmts-list');
-    list.innerHTML = comments.map(function (c) {
+    // a comment starting with the fix marker resolves every comment made before it
+    var isFix = function (c) { return /^\s*✅/.test(c.comment || ''); };
+    var lastFix = -1;
+    comments.forEach(function (c, i) { if (isFix(c)) lastFix = i; });
+    list.innerHTML = comments.map(function (c, i) {
       var d = c.ts ? new Date(c.ts) : null;
       var when = d ? d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear() : '';
-      return '<div class="cmt"><b>' + esc(c.name || 'Anonymous') + '</b><time>' + when + '</time>' +
+      var cls = isFix(c) ? ' fix' : (i < lastFix ? ' resolved' : '');
+      return '<div class="cmt' + cls + '"><b>' + esc(c.name || 'Anonymous') + '</b><time>' + when + '</time>' +
         '<p>' + esc(c.comment) + '</p></div>';
     }).join('');
     var btn = box.querySelector('.cmts-approve button.ok');
