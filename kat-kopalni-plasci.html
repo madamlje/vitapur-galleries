@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="sl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex"><title>Kopalni plašči — Vitapur galerije</title><style>
+  :root { --bg:#faf8f5; --ink:#2b2925; --muted:#8a8378; --accent:#9db48a; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--ink); font:16px/1.6 -apple-system,"Helvetica Neue",Segoe UI,sans-serif; -webkit-font-smoothing:antialiased; }
+  header { max-width:1080px; margin:0 auto; padding:56px 24px 36px; text-align:center; }
+  header .eyebrow { letter-spacing:.22em; text-transform:uppercase; font-size:12px; color:var(--accent); font-weight:600; }
+  header h1 { font-size:clamp(26px,4.5vw,42px); font-weight:600; letter-spacing:-.02em; margin:10px 0 8px; }
+  header p { color:var(--muted); max-width:600px; margin:0 auto; }
+  a.back { display:inline-block; margin-top:14px; color:var(--accent); text-decoration:none; font-weight:600; font-size:14px; }
+  .grid { max-width:1080px; margin:0 auto; padding:0 24px 80px; display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:22px; }
+  figure, .card { background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 1px 3px rgba(60,50,30,.08),0 8px 28px rgba(60,50,30,.06); }
+  figure a, .card a { display:block; text-decoration:none; color:inherit; }
+  figure img, .card img { width:100%; aspect-ratio:1/1; object-fit:cover; display:block; }
+  figcaption, .card .meta { padding:14px 18px 16px; }
+  .num { font-size:11px; letter-spacing:.18em; color:var(--accent); font-weight:700; }
+  .cap { font-size:14.5px; margin-top:2px; }
+  .card h2 { font-size:17px; font-weight:600; }
+  .card p { font-size:13.5px; color:var(--muted); margin-top:2px; }
+  .hero-tag { display:inline-block; background:var(--accent); color:#fff; font-size:11px; font-weight:700; letter-spacing:.1em; border-radius:999px; padding:2px 10px; margin-left:8px; vertical-align:1px; }
+  footer { text-align:center; color:var(--muted); font-size:13px; padding:0 24px 56px; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#191713; --ink:#ece7df; --muted:#97907f; } figure,.card { background:#221f1a; box-shadow:0 1px 3px rgba(0,0,0,.4);} }
+</style></head>
+<body><header><div class="eyebrow">Vitapur · Product Gallery Renewal</div><h1>Kopalni plašči</h1><p>Svilanit kopalni plašči za odrasle in otroke · 6 izdelkov. Klikni izdelek za galerijo; komentar vpiši pod posamezno sliko.</p><a class="back" href="index.html">&larr; Vse kategorije</a></header>
+<div class="grid">
+<div class="card"><a href="plasc-22613-cozy-cream.html"><img src="img/plasc-22613-cozy-cream/01_ps01.jpg" alt="Kopalni plašč Svilanit Cozy Cream" loading="lazy"><div class="meta"><h2>Kopalni plašč Svilanit Cozy Cream</h2><p>SKU 22613, 22614 · 4 slik</p></div></a></div>
+<div class="card"><a href="plasc-22617-cozy-mint.html"><img src="img/plasc-22617-cozy-mint/01_ps01.jpg" alt="Kopalni plašč Svilanit Cozy Mint" loading="lazy"><div class="meta"><h2>Kopalni plašč Svilanit Cozy Mint</h2><p>SKU 22617, 22618 · 6 slik</p></div></a></div>
+<div class="card"><a href="plasc-23836-infinity-siv.html"><img src="img/plasc-23836-infinity-siv/01_ps01.jpg" alt="Kopalni plašč Svilanit INFINITY, siv" loading="lazy"><div class="meta"><h2>Kopalni plašč Svilanit INFINITY, siv</h2><p>SKU 23836–23839 · 6 slik</p></div></a></div>
+<div class="card"><a href="plasc-23850-otroski-cozy-moder.html"><img src="img/plasc-23850-otroski-cozy-moder/01_ps01.jpg" alt="Otroški kopalni plašč Svilanit Cozy, moder" loading="lazy"><div class="meta"><h2>Otroški kopalni plašč Svilanit Cozy, moder</h2><p>SKU 23850–23853 · 6 slik</p></div></a></div>
+<div class="card"><a href="plasc-23854-otroski-cozy-bez.html"><img src="img/plasc-23854-otroski-cozy-bez/01_ps01.jpg" alt="Otroški kopalni plašč Svilanit Cozy, bež" loading="lazy"><div class="meta"><h2>Otroški kopalni plašč Svilanit Cozy, bež</h2><p>SKU 23854–23857 · 6 slik</p></div></a></div>
+<div class="card"><a href="plasc-23858-otroski-cozy-roza.html"><img src="img/plasc-23858-otroski-cozy-roza/01_ps01.jpg" alt="Otroški kopalni plašč Svilanit Cozy, roza" loading="lazy"><div class="meta"><h2>Otroški kopalni plašč Svilanit Cozy, roza</h2><p>SKU 23858–23861 · 6 slik</p></div></a></div>
+</div>
+<footer>Concept galleries — generated July 2026 · Vitapur</footer>
+<script>
+(function () {
+  var EP = 'https://script.google.com/macros/s/AKfycbw_v86WCB4X9IDygjf2Iiyeq-fugaLLUMVaZxcBAR8bQzC9NkSVDKIWscp63hgwM5Gu/exec';
+  var APPROVED = '__APPROVED__';
+  function cleanId(s) { return String(s == null ? '' : s).split('?')[0].replace(/\.[a-z]+$/i, ''); }
+  fetch(EP).then(function (r) { return r.json(); }).then(function (all) {
+    var byProduct = {};
+    all.forEach(function (c) {
+      if (c.comment !== APPROVED) return;
+      var p = c.product, k = cleanId(c.image);
+      (byProduct[p] = byProduct[p] || {})[k] = true;
+    });
+    document.querySelectorAll('.card a[href$=".html"]').forEach(function (a) {
+      var key = a.getAttribute('href').replace('.html', '');
+      var p = a.querySelector('.meta p');
+      if (!p) return;
+      var m = p.textContent.match(/(\d+)\s*(slik|images)/i);
+      var total = m ? parseInt(m[1], 10) : null;
+      var n = Object.keys(byProduct[key] || {}).length;
+      if (total) {
+        var ok = n / total >= 0.7;
+        var span = document.createElement('span');
+        span.style.cssText = 'font-weight:700;color:' + (ok ? 'var(--accent)' : (n > 0 ? '#c9a24b' : 'var(--muted)')) + ';';
+        span.textContent = ' · ✓ ' + n + '/' + total + ' potrjenih';
+        p.appendChild(span);
+      }
+    });
+  }).catch(function () {});
+})();
+</script>
+</body></html>
